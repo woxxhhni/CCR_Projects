@@ -19,6 +19,20 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--counterparties", default=ROOT / "data" / "counterparty_reference.csv")
     parser.add_argument("--report", default=ROOT / "docs" / "sa_ccr_portfolio_report.md")
     parser.add_argument("--html-report", default=ROOT / "docs" / "sa_ccr_portfolio_report.html")
+    parser.add_argument("--title", default="SA-CCR Industry-Style Portfolio Capital Report")
+    parser.add_argument("--data-date", default="2025-02-14")
+    parser.add_argument("--data-source", default="Public-safe anonymized industry-style derivative portfolio")
+    parser.add_argument(
+        "--portfolio-description",
+        default=(
+            "The portfolio is a public-safe anonymized sample generated in this GitHub project from "
+            "bank SA-CCR implementation field conventions and Basel-style product coverage. It preserves "
+            "realistic product scope, margin fields, netting-set structure, and notional ranges, but does "
+            "not copy client/project trade rows or original counterparty names."
+        ),
+    )
+    parser.add_argument("--trade-note", default="Generated industry-style trades")
+    parser.add_argument("--workflow", choices=["industry-style", "dtcc"], default="industry-style")
     return parser.parse_args()
 
 
@@ -59,6 +73,12 @@ def build_context(args: argparse.Namespace) -> dict[str, object]:
 
     return {
         "generated_on": date.today().isoformat(),
+        "title": args.title,
+        "data_date": args.data_date,
+        "data_source": args.data_source,
+        "portfolio_description": args.portfolio_description,
+        "trade_note": args.trade_note,
+        "workflow": args.workflow,
         "trades": trades,
         "exposure": exposure,
         "product_summary": product_summary,
@@ -83,14 +103,14 @@ def build_context(args: argparse.Namespace) -> dict[str, object]:
 def build_markdown_report(context: dict[str, object]) -> str:
     totals = context["totals"]
     lines = [
-        "# SA-CCR Portfolio Capital Report",
+        f"# {context['title']}",
         "",
         f"Generated on: {context['generated_on']}",
         "",
         "## 1. Executive Summary",
         "",
         "This report summarizes a Python-based SA-CCR portfolio capital engine built for counterparty credit risk analysis. "
-        "The portfolio uses public DTCC CFTC swap dissemination records for trade economics and deterministic synthetic fields for internal bank data that public SDR files do not disclose.",
+        f"{context['portfolio_description']}",
         "",
         md_table(
             [
@@ -155,12 +175,27 @@ def build_markdown_report(context: dict[str, object]) -> str:
         "",
         "## 5. References",
         "",
-        "- Basel Committee on Banking Supervision, [The standardised approach for measuring counterparty credit risk exposures](https://www.bis.org/publ/bcbs279.pdf).",
-        "- BIS Basel Framework, [CRE52 - Standardised approach to counterparty credit risk](https://www.bis.org/basel_framework/chapter/CRE/52.htm).",
-        "- DTCC, [Public Price Dissemination Dashboard](https://pddata.dtcc.com/ppd/info-center).",
+        *reference_markdown_lines(context["workflow"]),
+        "",
+        "## 6. Reproducibility",
+        "",
+        "```bash",
+        *workflow_commands(context["workflow"]),
+        "```",
         "",
     ]
     return "\n".join(lines)
+
+
+def reference_markdown_lines(workflow: object) -> list[str]:
+    lines = [
+        "- Basel Committee on Banking Supervision, [The standardised approach for measuring counterparty credit risk exposures](https://www.bis.org/publ/bcbs279.pdf).",
+        "- BIS Basel Framework, [CRE52 - Standardised approach to counterparty credit risk](https://www.bis.org/basel_framework/chapter/CRE/52.htm).",
+        "- China State Council / NFRA, [Commercial Bank Capital Management Measures](https://www.gov.cn/zhengce/202311/content_6913410.htm).",
+    ]
+    if workflow == "dtcc":
+        lines.append("- DTCC, [Public Price Dissemination Dashboard](https://pddata.dtcc.com/ppd/info-center).")
+    return lines
 
 
 def build_html_report(context: dict[str, object]) -> str:
@@ -174,7 +209,7 @@ def build_html_report(context: dict[str, object]) -> str:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SA-CCR Portfolio Capital Report</title>
+  <title>{escape(str(context['title']))}</title>
   <style>
     :root {{
       --ink: #162033;
@@ -422,21 +457,21 @@ def build_html_report(context: dict[str, object]) -> str:
   <div class="page">
     <header>
       <div class="eyebrow">Counterparty Credit Risk Portfolio Deliverable</div>
-      <h1>SA-CCR Portfolio Capital Report</h1>
+      <h1>{escape(str(context['title']))}</h1>
       <p class="subtitle">A concentrated delivery report covering product scope, calculation methodology, final EAD/RWA results, key drivers, assumptions, and reproducibility for the Python SA-CCR engine.</p>
       <div class="meta">
         <span>Generated: {escape(str(context['generated_on']))}</span>
-        <span>Data date: 2025-02-14</span>
-        <span>Source economics: DTCC CFTC PPD swap records</span>
+        <span>Data date: {escape(str(context['data_date']))}</span>
+        <span>Dataset: {escape(str(context['data_source']))}</span>
       </div>
     </header>
 
     <main>
       <section>
         <h2>Executive Snapshot</h2>
-        <p>The portfolio contains real public swap transaction economics enriched with deterministic internal-bank fields so the data can support a full SA-CCR workflow.</p>
+        <p>{escape(str(context['portfolio_description']))}</p>
         <div class="kpi-grid">
-          {kpi_card("Trades", f"{context['trade_count']:,}", "Curated DTCC SDR records")}
+          {kpi_card("Trades", f"{context['trade_count']:,}", str(context["trade_note"]))}
           {kpi_card("Base Notional", money(context["total_notional"]), "USD converted reproducibility basis")}
           {kpi_card("Netting Sets", f"{context['netting_set_count']:,}", f"{context['counterparty_count']:,} counterparties")}
           {kpi_card("Total EAD", money(totals["EAD"]), f"Before cap: {money(context['ead_before_cap'])}")}
@@ -472,8 +507,8 @@ Margined RC = max(V - C, TH + MTA - NICA, 0)</div>
           </div>
           <div class="panel">
             <h3>Data Separation</h3>
-            <p>Public SDR fields provide product economics such as asset class, notional, currency, dates, cleared flag, product identifiers, and underlier information.</p>
-            <p>Synthetic fields are added for internal bank concepts not publicly disclosed: counterparty, legal netting set, CSA terms, collateral, MtM, direction, and risk weight.</p>
+            <p>The sample generator creates product economics such as asset class, notional, currency, dates, cleared flag, product identifiers, underlier information, and option terms.</p>
+            <p>Internal bank concepts are synthetic and reproducible: counterparty, legal netting set, CSA terms, collateral, MtM, direction, and risk weight.</p>
           </div>
         </div>
         <div class="flow">
@@ -552,23 +587,15 @@ Margined RC = max(V - C, TH + MTA - NICA, 0)</div>
           </div>
         </div>
         <div class="callout">
-          <strong>Interview positioning:</strong> this is best described as a Basel-aligned educational SA-CCR capital engine using real public trade economics and synthetic internal-bank fields. It demonstrates product classification, trade enrichment, exposure aggregation, capital logic, controls, and limitations.
+          <strong>Interview positioning:</strong> this is best described as a Basel-aligned educational SA-CCR capital engine using a generated public-safe industry-style portfolio. It demonstrates product classification, trade enrichment, exposure aggregation, capital logic, controls, and limitations.
         </div>
       </section>
 
       <section>
         <h2>References and Reproducibility</h2>
-        <p>Primary regulatory and data references:</p>
-        <ul>
-          <li><a href="https://www.bis.org/publ/bcbs279.pdf">Basel Committee: The standardised approach for measuring counterparty credit risk exposures</a></li>
-          <li><a href="https://www.bis.org/basel_framework/chapter/CRE/52.htm">BIS Basel Framework CRE52: Standardised approach to counterparty credit risk</a></li>
-          <li><a href="https://pddata.dtcc.com/ppd/info-center">DTCC Public Price Dissemination Dashboard</a></li>
-        </ul>
-        <div class="formula">python scripts/download_dtcc_sdr.py --date 2025-02-14
-python scripts/build_saccr_sample_from_sdr.py
-python scripts/run_saccr.py
-python scripts/generate_report.py
-pytest</div>
+        <p>Primary regulatory references and reproducibility commands:</p>
+        {references_html(context["workflow"])}
+        <div class="formula">{escape(chr(10).join(workflow_commands(context["workflow"])))}</div>
       </section>
     </main>
     <footer>
@@ -577,6 +604,20 @@ pytest</div>
   </div>
 </body>
 </html>"""
+
+
+def references_html(workflow: object) -> str:
+    references = [
+        ("https://www.bis.org/publ/bcbs279.pdf", "Basel Committee: The standardised approach for measuring counterparty credit risk exposures"),
+        ("https://www.bis.org/basel_framework/chapter/CRE/52.htm", "BIS Basel Framework CRE52: Standardised approach to counterparty credit risk"),
+        ("https://www.gov.cn/zhengce/202311/content_6913410.htm", "China State Council / NFRA: Commercial Bank Capital Management Measures"),
+    ]
+    if workflow == "dtcc":
+        references.append(("https://pddata.dtcc.com/ppd/info-center", "DTCC Public Price Dissemination Dashboard"))
+    items = "".join(
+        f'<li><a href="{escape(url)}">{escape(label)}</a></li>' for url, label in references
+    )
+    return f"<ul>{items}</ul>"
 
 
 def build_product_summary(trades: pd.DataFrame) -> list[list[str]]:
@@ -743,6 +784,23 @@ def html_table_with_cap_badges(rows: list[list[str]], headers: list[str]) -> str
                 cells.append(f"<td>{escape(str(cell))}</td>")
         body_rows.append(f"<tr>{''.join(cells)}</tr>")
     return f"<table><thead><tr>{thead}</tr></thead><tbody>{''.join(body_rows)}</tbody></table>"
+
+
+def workflow_commands(workflow: object) -> list[str]:
+    if workflow == "industry-style":
+        return [
+            "python scripts/build_industry_style_sample.py",
+            "python scripts/run_saccr.py",
+            "python scripts/generate_report.py",
+            "pytest",
+        ]
+    return [
+        "python scripts/download_dtcc_sdr.py --date 2025-02-14",
+        "python scripts/build_saccr_sample_from_sdr.py",
+        "python scripts/run_saccr.py",
+        "python scripts/generate_report.py",
+        "pytest",
+    ]
 
 
 def md_table(rows: list[list[str]], headers: list[str]) -> str:

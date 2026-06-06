@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SA-CCR Portfolio Capital Report</title>
+  <title>SA-CCR Industry-Style Portfolio Capital Report</title>
   <style>
     :root {
       --ink: #162033;
@@ -251,28 +251,28 @@
   <div class="page">
     <header>
       <div class="eyebrow">Counterparty Credit Risk Portfolio Deliverable</div>
-      <h1>SA-CCR Portfolio Capital Report</h1>
+      <h1>SA-CCR Industry-Style Portfolio Capital Report</h1>
       <p class="subtitle">A concentrated delivery report covering product scope, calculation methodology, final EAD/RWA results, key drivers, assumptions, and reproducibility for the Python SA-CCR engine.</p>
       <div class="meta">
         <span>Generated: 2026-06-06</span>
         <span>Data date: 2025-02-14</span>
-        <span>Source economics: DTCC CFTC PPD swap records</span>
+        <span>Dataset: Public-safe anonymized industry-style derivative portfolio</span>
       </div>
     </header>
 
     <main>
       <section>
         <h2>Executive Snapshot</h2>
-        <p>The portfolio contains real public swap transaction economics enriched with deterministic internal-bank fields so the data can support a full SA-CCR workflow.</p>
+        <p>The portfolio is a public-safe anonymized sample generated in this GitHub project from bank SA-CCR implementation field conventions and Basel-style product coverage. It preserves realistic product scope, margin fields, netting-set structure, and notional ranges, but does not copy client/project trade rows or original counterparty names.</p>
         <div class="kpi-grid">
-          <article class="kpi"><span>Trades</span><strong>320</strong><small>Curated DTCC SDR records</small></article>
-          <article class="kpi"><span>Base Notional</span><strong>$15.68bn</strong><small>USD converted reproducibility basis</small></article>
-          <article class="kpi"><span>Netting Sets</span><strong>63</strong><small>8 counterparties</small></article>
-          <article class="kpi"><span>Total EAD</span><strong>$87.38mm</strong><small>Before cap: $117.35mm</small></article>
-          <article class="kpi"><span>Total RWA</span><strong>$53.15mm</strong><small>Illustrative risk weights</small></article>
-          <article class="kpi"><span>AddOn Aggregate</span><strong>$62.79mm</strong><small>Sum across netting sets</small></article>
-          <article class="kpi"><span>RC / PFE</span><strong>$56.68mm / $27.14mm</strong><small>Replacement cost and potential future exposure</small></article>
-          <article class="kpi"><span>Caps Applied</span><strong>6</strong><small>EAD reduction: $29.97mm</small></article>
+          <article class="kpi"><span>Trades</span><strong>298</strong><small>Generated industry-style trades</small></article>
+          <article class="kpi"><span>Base Notional</span><strong>$54.96bn</strong><small>USD converted reproducibility basis</small></article>
+          <article class="kpi"><span>Netting Sets</span><strong>95</strong><small>12 counterparties</small></article>
+          <article class="kpi"><span>Total EAD</span><strong>$656.70mm</strong><small>Before cap: $656.70mm</small></article>
+          <article class="kpi"><span>Total RWA</span><strong>$381.78mm</strong><small>Illustrative risk weights</small></article>
+          <article class="kpi"><span>AddOn Aggregate</span><strong>$568.04mm</strong><small>Sum across netting sets</small></article>
+          <article class="kpi"><span>RC / PFE</span><strong>$114.21mm / $354.86mm</strong><small>Replacement cost and potential future exposure</small></article>
+          <article class="kpi"><span>Caps Applied</span><strong>0</strong><small>EAD reduction: $0.00</small></article>
         </div>
       </section>
 
@@ -280,14 +280,14 @@
         <h2>Product Coverage</h2>
         <p>The sample is designed to demonstrate the five SA-CCR asset classes and several distinct product treatments, including maturity-bucket aggregation, FX currency-pair aggregation, credit/equity entity correlation, and commodity group/type aggregation.</p>
         <div class="asset-grid">
-          <div class="asset-card"><strong>Commodity</strong><span>70 trades</span><span>5 products</span><span>$310.84mm</span></div>
-<div class="asset-card"><strong>Credit</strong><span>50 trades</span><span>3 products</span><span>$2.35bn</span></div>
-<div class="asset-card"><strong>Equity</strong><span>50 trades</span><span>1 products</span><span>$4.79mm</span></div>
-<div class="asset-card"><strong>FX</strong><span>70 trades</span><span>3 products</span><span>$1.21bn</span></div>
-<div class="asset-card"><strong>Interest Rate</strong><span>80 trades</span><span>3 products</span><span>$11.80bn</span></div>
+          <div class="asset-card"><strong>Commodity</strong><span>52 trades</span><span>5 products</span><span>$1.61bn</span></div>
+<div class="asset-card"><strong>Credit</strong><span>34 trades</span><span>3 products</span><span>$2.65bn</span></div>
+<div class="asset-card"><strong>Equity</strong><span>24 trades</span><span>2 products</span><span>$855.20mm</span></div>
+<div class="asset-card"><strong>FX</strong><span>84 trades</span><span>3 products</span><span>$5.42bn</span></div>
+<div class="asset-card"><strong>Interest Rate</strong><span>104 trades</span><span>6 products</span><span>$44.43bn</span></div>
         </div>
         <div class="table-wrap">
-          <table><thead><tr><th>Asset Class</th><th>Product</th><th>Trades</th><th>Base Notional</th><th>Margined</th><th>Unmargined</th></tr></thead><tbody><tr><td>Commodity</td><td>Commodity Agricultural</td><td>14</td><td>$10.53mm</td><td>9</td><td>5</td></tr><tr><td>Commodity</td><td>Commodity Energy</td><td>14</td><td>$8.52mm</td><td>12</td><td>2</td></tr><tr><td>Commodity</td><td>Commodity Metals</td><td>14</td><td>$55.02mm</td><td>11</td><td>3</td></tr><tr><td>Commodity</td><td>Commodity Option</td><td>14</td><td>$97.90mm</td><td>6</td><td>8</td></tr><tr><td>Commodity</td><td>Commodity Other</td><td>14</td><td>$138.87mm</td><td>10</td><td>4</td></tr><tr><td>Credit</td><td>Credit Index CDS</td><td>41</td><td>$1.46bn</td><td>39</td><td>2</td></tr><tr><td>Credit</td><td>Credit Other</td><td>5</td><td>$580.50mm</td><td>5</td><td>0</td></tr><tr><td>Credit</td><td>Credit Single Name CDS</td><td>4</td><td>$316.47mm</td><td>4</td><td>0</td></tr><tr><td>Equity</td><td>Equity Single Stock TRS</td><td>50</td><td>$4.79mm</td><td>31</td><td>19</td></tr><tr><td>FX</td><td>FX Forward/NDF</td><td>24</td><td>$41.75mm</td><td>16</td><td>8</td></tr><tr><td>FX</td><td>FX Option</td><td>24</td><td>$938.65mm</td><td>18</td><td>6</td></tr><tr><td>FX</td><td>FX Swap</td><td>22</td><td>$225.42mm</td><td>13</td><td>9</td></tr><tr><td>Interest Rate</td><td>Interest Rate FRA</td><td>27</td><td>$6.35bn</td><td>26</td><td>1</td></tr><tr><td>Interest Rate</td><td>Interest Rate Fixed-Float</td><td>27</td><td>$2.21bn</td><td>26</td><td>1</td></tr><tr><td>Interest Rate</td><td>Interest Rate OIS</td><td>26</td><td>$3.24bn</td><td>25</td><td>1</td></tr></tbody></table>
+          <table><thead><tr><th>Asset Class</th><th>Product</th><th>Trades</th><th>Base Notional</th><th>Margined</th><th>Unmargined</th></tr></thead><tbody><tr><td>Commodity</td><td>Commodity Option</td><td>12</td><td>$368.10mm</td><td>8</td><td>4</td></tr><tr><td>Commodity</td><td>Electricity Swap</td><td>6</td><td>$140.90mm</td><td>5</td><td>1</td></tr><tr><td>Commodity</td><td>Oil Forward</td><td>10</td><td>$141.50mm</td><td>8</td><td>2</td></tr><tr><td>Commodity</td><td>Precious Metal Forward</td><td>14</td><td>$594.20mm</td><td>10</td><td>4</td></tr><tr><td>Commodity</td><td>Precious Metal Swap</td><td>10</td><td>$369.60mm</td><td>7</td><td>3</td></tr><tr><td>Credit</td><td>Credit Index CDS</td><td>12</td><td>$1.44bn</td><td>8</td><td>4</td></tr><tr><td>Credit</td><td>Credit Single Name CDS</td><td>10</td><td>$462.10mm</td><td>5</td><td>5</td></tr><tr><td>Credit</td><td>Credit TRS</td><td>12</td><td>$751.40mm</td><td>6</td><td>6</td></tr><tr><td>Equity</td><td>Equity Index Option</td><td>10</td><td>$429.20mm</td><td>6</td><td>4</td></tr><tr><td>Equity</td><td>Equity TRS</td><td>14</td><td>$426.00mm</td><td>10</td><td>4</td></tr><tr><td>FX</td><td>FX Forward</td><td>32</td><td>$1.78bn</td><td>20</td><td>12</td></tr><tr><td>FX</td><td>FX Option</td><td>28</td><td>$1.69bn</td><td>15</td><td>13</td></tr><tr><td>FX</td><td>FX Swap</td><td>24</td><td>$1.96bn</td><td>18</td><td>6</td></tr><tr><td>Interest Rate</td><td>Cap/Floor</td><td>14</td><td>$3.30bn</td><td>9</td><td>5</td></tr><tr><td>Interest Rate</td><td>Cross Currency Swap</td><td>16</td><td>$4.61bn</td><td>11</td><td>5</td></tr><tr><td>Interest Rate</td><td>Interest Rate FRA</td><td>16</td><td>$2.41bn</td><td>11</td><td>5</td></tr><tr><td>Interest Rate</td><td>Interest Rate Swap</td><td>34</td><td>$25.75bn</td><td>25</td><td>9</td></tr><tr><td>Interest Rate</td><td>OIS</td><td>14</td><td>$6.58bn</td><td>13</td><td>1</td></tr><tr><td>Interest Rate</td><td>Swaption</td><td>10</td><td>$1.78bn</td><td>9</td><td>1</td></tr></tbody></table>
         </div>
       </section>
 
@@ -305,8 +305,8 @@ Margined RC = max(V - C, TH + MTA - NICA, 0)</div>
           </div>
           <div class="panel">
             <h3>Data Separation</h3>
-            <p>Public SDR fields provide product economics such as asset class, notional, currency, dates, cleared flag, product identifiers, and underlier information.</p>
-            <p>Synthetic fields are added for internal bank concepts not publicly disclosed: counterparty, legal netting set, CSA terms, collateral, MtM, direction, and risk weight.</p>
+            <p>The sample generator creates product economics such as asset class, notional, currency, dates, cleared flag, product identifiers, underlier information, and option terms.</p>
+            <p>Internal bank concepts are synthetic and reproducible: counterparty, legal netting set, CSA terms, collateral, MtM, direction, and risk weight.</p>
           </div>
         </div>
         <div class="flow">
@@ -324,33 +324,33 @@ Margined RC = max(V - C, TH + MTA - NICA, 0)</div>
         <div class="two-col">
           <div class="panel">
             <h3>Portfolio Totals</h3>
-            <table><thead><tr><th>Measure</th><th>Amount</th></tr></thead><tbody><tr><td>AddOn Aggregate</td><td>$62.79mm</td></tr><tr><td>PFE</td><td>$27.14mm</td></tr><tr><td>RC</td><td>$56.68mm</td></tr><tr><td>EAD</td><td>$87.38mm</td></tr><tr><td>RWA</td><td>$53.15mm</td></tr><tr><td>EAD before margined cap</td><td>$117.35mm</td></tr><tr><td>EAD reduction from cap</td><td>$29.97mm</td></tr></tbody></table>
+            <table><thead><tr><th>Measure</th><th>Amount</th></tr></thead><tbody><tr><td>AddOn Aggregate</td><td>$568.04mm</td></tr><tr><td>PFE</td><td>$354.86mm</td></tr><tr><td>RC</td><td>$114.21mm</td></tr><tr><td>EAD</td><td>$656.70mm</td></tr><tr><td>RWA</td><td>$381.78mm</td></tr><tr><td>EAD before margined cap</td><td>$656.70mm</td></tr><tr><td>EAD reduction from cap</td><td>$0.00</td></tr></tbody></table>
           </div>
           <div class="panel">
             <h3>What Drives the Result</h3>
             <ul>
               <li>Commodity, interest rate, and FX are the largest add-on drivers in this portfolio.</li>
               <li>RC is concentrated in counterparties with positive net MtM after collateral and margin mechanics.</li>
-              <li>The margined EAD cap reduces total EAD by $29.97mm across 6 netting sets.</li>
+              <li>The margined EAD cap reduces total EAD by $0.00 across 0 netting sets.</li>
               <li>RWA depends on illustrative counterparty risk weights and is not a jurisdiction-specific capital filing.</li>
             </ul>
           </div>
         </div>
 
         <h3>Add-On by Asset Class</h3>
-        <div class="chart"><div class="bar-row"><div class="bar-label">Commodity</div><div class="bar-track"><div class="bar bar-0" style="width: 100.0%"></div></div><div>$19.56mm (31.1%)</div></div><div class="bar-row"><div class="bar-label">Interest Rate</div><div class="bar-track"><div class="bar bar-1" style="width: 97.2%"></div></div><div>$19.02mm (30.3%)</div></div><div class="bar-row"><div class="bar-label">FX</div><div class="bar-track"><div class="bar bar-2" style="width: 85.3%"></div></div><div>$16.68mm (26.6%)</div></div><div class="bar-row"><div class="bar-label">Credit</div><div class="bar-track"><div class="bar bar-3" style="width: 33.7%"></div></div><div>$6.60mm (10.5%)</div></div><div class="bar-row"><div class="bar-label">Equity</div><div class="bar-track"><div class="bar bar-4" style="width: 4.8%"></div></div><div>$932.78k (1.5%)</div></div></div>
+        <div class="chart"><div class="bar-row"><div class="bar-label">Interest Rate</div><div class="bar-track"><div class="bar bar-0" style="width: 100.0%"></div></div><div>$278.14mm (49.0%)</div></div><div class="bar-row"><div class="bar-label">Commodity</div><div class="bar-track"><div class="bar bar-1" style="width: 44.1%"></div></div><div>$122.60mm (21.6%)</div></div><div class="bar-row"><div class="bar-label">Equity</div><div class="bar-track"><div class="bar bar-2" style="width: 27.4%"></div></div><div>$76.21mm (13.4%)</div></div><div class="bar-row"><div class="bar-label">FX</div><div class="bar-track"><div class="bar bar-3" style="width: 24.3%"></div></div><div>$67.47mm (11.9%)</div></div><div class="bar-row"><div class="bar-label">Credit</div><div class="bar-track"><div class="bar bar-4" style="width: 8.5%"></div></div><div>$23.62mm (4.2%)</div></div></div>
 
         <h3>Counterparty RWA Ranking</h3>
-        <div class="chart"><div class="bar-row"><div class="bar-label">CP_CORPORATE_A</div><div class="bar-track"><div class="bar bar-0" style="width: 100.0%"></div></div><div>$23.78mm</div></div><div class="bar-row"><div class="bar-label">CP_HEDGE_FUND_A</div><div class="bar-track"><div class="bar bar-1" style="width: 31.7%"></div></div><div>$7.53mm</div></div><div class="bar-row"><div class="bar-label">CP_PENSION_A</div><div class="bar-track"><div class="bar bar-2" style="width: 27.2%"></div></div><div>$6.46mm</div></div><div class="bar-row"><div class="bar-label">CP_SOVEREIGN_A</div><div class="bar-track"><div class="bar bar-3" style="width: 17.4%"></div></div><div>$4.13mm</div></div><div class="bar-row"><div class="bar-label">CP_BANK_B</div><div class="bar-track"><div class="bar bar-4" style="width: 13.9%"></div></div><div>$3.30mm</div></div><div class="bar-row"><div class="bar-label">CP_ASSET_MANAGER_A</div><div class="bar-track"><div class="bar bar-0" style="width: 13.7%"></div></div><div>$3.26mm</div></div><div class="bar-row"><div class="bar-label">CP_INSURER_A</div><div class="bar-track"><div class="bar bar-1" style="width: 11.0%"></div></div><div>$2.61mm</div></div><div class="bar-row"><div class="bar-label">CP_BANK_A</div><div class="bar-track"><div class="bar bar-2" style="width: 8.7%"></div></div><div>$2.08mm</div></div></div>
+        <div class="chart"><div class="bar-row"><div class="bar-label">IND_CORPORATE_002</div><div class="bar-track"><div class="bar bar-0" style="width: 100.0%"></div></div><div>$69.00mm</div></div><div class="bar-row"><div class="bar-label">IND_HEDGE_FUND_001</div><div class="bar-track"><div class="bar bar-1" style="width: 86.1%"></div></div><div>$59.38mm</div></div><div class="bar-row"><div class="bar-label">IND_INSURER_001</div><div class="bar-track"><div class="bar bar-2" style="width: 65.8%"></div></div><div>$45.42mm</div></div><div class="bar-row"><div class="bar-label">IND_BANK_002</div><div class="bar-track"><div class="bar bar-3" style="width: 57.7%"></div></div><div>$39.81mm</div></div><div class="bar-row"><div class="bar-label">IND_CLEARING_MEMBER_001</div><div class="bar-track"><div class="bar bar-4" style="width: 45.2%"></div></div><div>$31.18mm</div></div><div class="bar-row"><div class="bar-label">IND_PENSION_001</div><div class="bar-track"><div class="bar bar-0" style="width: 41.6%"></div></div><div>$28.72mm</div></div><div class="bar-row"><div class="bar-label">IND_REGIONAL_BANK_001</div><div class="bar-track"><div class="bar bar-1" style="width: 37.6%"></div></div><div>$25.91mm</div></div><div class="bar-row"><div class="bar-label">IND_CORPORATE_001</div><div class="bar-track"><div class="bar bar-2" style="width: 32.3%"></div></div><div>$22.28mm</div></div><div class="bar-row"><div class="bar-label">IND_ASSET_MANAGER_001</div><div class="bar-track"><div class="bar bar-3" style="width: 29.0%"></div></div><div>$20.00mm</div></div><div class="bar-row"><div class="bar-label">IND_SOVEREIGN_001</div><div class="bar-track"><div class="bar bar-4" style="width: 21.2%"></div></div><div>$14.60mm</div></div><div class="bar-row"><div class="bar-label">IND_BANK_001</div><div class="bar-track"><div class="bar bar-0" style="width: 20.7%"></div></div><div>$14.28mm</div></div><div class="bar-row"><div class="bar-label">IND_BROKER_001</div><div class="bar-track"><div class="bar bar-1" style="width: 16.2%"></div></div><div>$11.20mm</div></div></div>
 
         <h3>Counterparty Summary</h3>
         <div class="table-wrap">
-          <table><thead><tr><th>Counterparty</th><th>Type</th><th>Rating</th><th>AddOn</th><th>PFE</th><th>RC</th><th>EAD</th><th>RWA</th></tr></thead><tbody><tr><td>CP_CORPORATE_A</td><td>Corporate</td><td>BBB</td><td>$7.49mm</td><td>$1.71mm</td><td>$20.03mm</td><td>$23.78mm</td><td>$23.78mm</td></tr><tr><td>CP_HEDGE_FUND_A</td><td>Fund</td><td>BB</td><td>$8.68mm</td><td>$5.37mm</td><td>$5.38k</td><td>$7.53mm</td><td>$7.53mm</td></tr><tr><td>CP_PENSION_A</td><td>Pension</td><td>A</td><td>$15.19mm</td><td>$8.45mm</td><td>$785.86k</td><td>$12.93mm</td><td>$6.46mm</td></tr><tr><td>CP_SOVEREIGN_A</td><td>Sovereign</td><td>AA</td><td>$4.79mm</td><td>$325.68k</td><td>$26.75mm</td><td>$20.65mm</td><td>$4.13mm</td></tr><tr><td>CP_BANK_B</td><td>Bank</td><td>BBB</td><td>$6.03mm</td><td>$3.64mm</td><td>$1.08mm</td><td>$6.61mm</td><td>$3.30mm</td></tr><tr><td>CP_ASSET_MANAGER_A</td><td>Financial Institution</td><td>BBB</td><td>$6.81mm</td><td>$3.48mm</td><td>$1.17mm</td><td>$6.51mm</td><td>$3.26mm</td></tr><tr><td>CP_INSURER_A</td><td>Insurance</td><td>A</td><td>$4.88mm</td><td>$2.38mm</td><td>$3.57mm</td><td>$5.22mm</td><td>$2.61mm</td></tr><tr><td>CP_BANK_A</td><td>Bank</td><td>A</td><td>$8.92mm</td><td>$1.78mm</td><td>$3.29mm</td><td>$4.15mm</td><td>$2.08mm</td></tr></tbody></table>
+          <table><thead><tr><th>Counterparty</th><th>Type</th><th>Rating</th><th>AddOn</th><th>PFE</th><th>RC</th><th>EAD</th><th>RWA</th></tr></thead><tbody><tr><td>IND_CORPORATE_002</td><td>Corporate</td><td>BB</td><td>$48.30mm</td><td>$17.45mm</td><td>$31.83mm</td><td>$69.00mm</td><td>$69.00mm</td></tr><tr><td>IND_HEDGE_FUND_001</td><td>Fund</td><td>BB</td><td>$59.20mm</td><td>$40.32mm</td><td>$2.10mm</td><td>$59.38mm</td><td>$59.38mm</td></tr><tr><td>IND_INSURER_001</td><td>Insurance</td><td>A</td><td>$73.48mm</td><td>$54.30mm</td><td>$10.57mm</td><td>$90.83mm</td><td>$45.42mm</td></tr><tr><td>IND_BANK_002</td><td>Bank</td><td>BBB</td><td>$49.62mm</td><td>$24.54mm</td><td>$32.34mm</td><td>$79.63mm</td><td>$39.81mm</td></tr><tr><td>IND_CLEARING_MEMBER_001</td><td>Clearing Member</td><td>A</td><td>$60.40mm</td><td>$41.18mm</td><td>$3.37mm</td><td>$62.36mm</td><td>$31.18mm</td></tr><tr><td>IND_PENSION_001</td><td>Pension</td><td>A</td><td>$50.32mm</td><td>$34.46mm</td><td>$6.58mm</td><td>$57.45mm</td><td>$28.72mm</td></tr><tr><td>IND_REGIONAL_BANK_001</td><td>Bank</td><td>BBB</td><td>$45.06mm</td><td>$31.90mm</td><td>$5.12mm</td><td>$51.82mm</td><td>$25.91mm</td></tr><tr><td>IND_CORPORATE_001</td><td>Corporate</td><td>BBB</td><td>$20.20mm</td><td>$14.41mm</td><td>$1.50mm</td><td>$22.28mm</td><td>$22.28mm</td></tr><tr><td>IND_ASSET_MANAGER_001</td><td>Asset Manager</td><td>A</td><td>$38.90mm</td><td>$27.00mm</td><td>$1.57mm</td><td>$40.00mm</td><td>$20.00mm</td></tr><tr><td>IND_SOVEREIGN_001</td><td>Sovereign</td><td>AA</td><td>$60.41mm</td><td>$34.11mm</td><td>$18.03mm</td><td>$72.99mm</td><td>$14.60mm</td></tr><tr><td>IND_BANK_001</td><td>Bank</td><td>A</td><td>$39.00mm</td><td>$19.45mm</td><td>$950.25k</td><td>$28.57mm</td><td>$14.28mm</td></tr><tr><td>IND_BROKER_001</td><td>Broker Dealer</td><td>BBB</td><td>$23.14mm</td><td>$15.74mm</td><td>$259.80k</td><td>$22.40mm</td><td>$11.20mm</td></tr></tbody></table>
         </div>
 
         <h3>Largest Netting Sets by EAD</h3>
         <div class="table-wrap">
-          <table><thead><tr><th>Counterparty</th><th>Netting Set</th><th>Margin</th><th>AddOn</th><th>PFE</th><th>RC</th><th>EAD</th><th>RWA</th><th>Cap Applied</th></tr></thead><tbody><tr><td>CP_CORPORATE_A</td><td>1069</td><td>M</td><td>$2.99mm</td><td>$149.58k</td><td>$20.03mm</td><td>$22.79mm</td><td>$22.79mm</td><td><span class="badge badge-yes">Yes</span></td></tr><tr><td>CP_SOVEREIGN_A</td><td>1037</td><td>M</td><td>$3.41mm</td><td>$170.38k</td><td>$26.71mm</td><td>$20.38mm</td><td>$4.08mm</td><td><span class="badge badge-yes">Yes</span></td></tr><tr><td>CP_PENSION_A</td><td>1029</td><td>U</td><td>$6.15mm</td><td>$5.99mm</td><td>$0.00</td><td>$8.39mm</td><td>$4.19mm</td><td><span class="badge badge-no">No</span></td></tr><tr><td>CP_HEDGE_FUND_A</td><td>1028</td><td>U</td><td>$3.99mm</td><td>$3.86mm</td><td>$0.00</td><td>$5.41mm</td><td>$5.41mm</td><td><span class="badge badge-no">No</span></td></tr><tr><td>CP_ASSET_MANAGER_A</td><td>1021</td><td>U</td><td>$2.85mm</td><td>$2.85mm</td><td>$778.71k</td><td>$5.07mm</td><td>$2.54mm</td><td><span class="badge badge-no">No</span></td></tr><tr><td>CP_BANK_B</td><td>1015</td><td>U</td><td>$2.51mm</td><td>$2.51mm</td><td>$99.84k</td><td>$3.66mm</td><td>$1.83mm</td><td><span class="badge badge-no">No</span></td></tr><tr><td>CP_PENSION_A</td><td>1096</td><td>M</td><td>$2.63mm</td><td>$1.02mm</td><td>$291.72k</td><td>$1.83mm</td><td>$915.21k</td><td><span class="badge badge-no">No</span></td></tr><tr><td>CP_INSURER_A</td><td>1087</td><td>M</td><td>$1.98mm</td><td>$1.02mm</td><td>$43.55k</td><td>$1.49mm</td><td>$746.89k</td><td><span class="badge badge-no">No</span></td></tr><tr><td>CP_INSURER_A</td><td>1092</td><td>U</td><td>$1.02mm</td><td>$1.02mm</td><td>$28.91k</td><td>$1.47mm</td><td>$737.02k</td><td><span class="badge badge-no">No</span></td></tr><tr><td>CP_BANK_A</td><td>1079</td><td>M</td><td>$2.40mm</td><td>$346.67k</td><td>$698.77k</td><td>$1.46mm</td><td>$731.81k</td><td><span class="badge badge-no">No</span></td></tr></tbody></table>
+          <table><thead><tr><th>Counterparty</th><th>Netting Set</th><th>Margin</th><th>AddOn</th><th>PFE</th><th>RC</th><th>EAD</th><th>RWA</th><th>Cap Applied</th></tr></thead><tbody><tr><td>IND_HEDGE_FUND_001</td><td>3012</td><td>U</td><td>$36.24mm</td><td>$36.24mm</td><td>$512.74k</td><td>$51.45mm</td><td>$51.45mm</td><td><span class="badge badge-no">No</span></td></tr><tr><td>IND_INSURER_001</td><td>3048</td><td>U</td><td>$31.78mm</td><td>$31.78mm</td><td>$4.81mm</td><td>$51.23mm</td><td>$25.62mm</td><td><span class="badge badge-no">No</span></td></tr><tr><td>IND_BANK_002</td><td>3049</td><td>M</td><td>$19.32mm</td><td>$5.37mm</td><td>$28.29mm</td><td>$47.12mm</td><td>$23.56mm</td><td><span class="badge badge-no">No</span></td></tr><tr><td>IND_CORPORATE_002</td><td>3074</td><td>M</td><td>$26.54mm</td><td>$1.33mm</td><td>$24.92mm</td><td>$36.76mm</td><td>$36.76mm</td><td><span class="badge badge-no">No</span></td></tr><tr><td>IND_ASSET_MANAGER_001</td><td>3205</td><td>U</td><td>$23.96mm</td><td>$22.58mm</td><td>$0.00</td><td>$31.62mm</td><td>$15.81mm</td><td><span class="badge badge-no">No</span></td></tr><tr><td>IND_PENSION_001</td><td>3060</td><td>U</td><td>$19.76mm</td><td>$19.31mm</td><td>$0.00</td><td>$27.04mm</td><td>$13.52mm</td><td><span class="badge badge-no">No</span></td></tr><tr><td>IND_CLEARING_MEMBER_001</td><td>3161</td><td>U</td><td>$15.31mm</td><td>$15.31mm</td><td>$490.02k</td><td>$22.11mm</td><td>$11.06mm</td><td><span class="badge badge-no">No</span></td></tr><tr><td>IND_REGIONAL_BANK_001</td><td>3054</td><td>U</td><td>$15.28mm</td><td>$15.28mm</td><td>$462.79k</td><td>$22.04mm</td><td>$11.02mm</td><td><span class="badge badge-no">No</span></td></tr><tr><td>IND_INSURER_001</td><td>3390</td><td>U</td><td>$10.49mm</td><td>$10.49mm</td><td>$3.24mm</td><td>$19.21mm</td><td>$9.61mm</td><td><span class="badge badge-no">No</span></td></tr><tr><td>IND_SOVEREIGN_001</td><td>3065</td><td>U</td><td>$11.29mm</td><td>$11.29mm</td><td>$1.52mm</td><td>$17.94mm</td><td>$3.59mm</td><td><span class="badge badge-no">No</span></td></tr></tbody></table>
         </div>
       </section>
 
@@ -377,20 +377,15 @@ Margined RC = max(V - C, TH + MTA - NICA, 0)</div>
           </div>
         </div>
         <div class="callout">
-          <strong>Interview positioning:</strong> this is best described as a Basel-aligned educational SA-CCR capital engine using real public trade economics and synthetic internal-bank fields. It demonstrates product classification, trade enrichment, exposure aggregation, capital logic, controls, and limitations.
+          <strong>Interview positioning:</strong> this is best described as a Basel-aligned educational SA-CCR capital engine using a generated public-safe industry-style portfolio. It demonstrates product classification, trade enrichment, exposure aggregation, capital logic, controls, and limitations.
         </div>
       </section>
 
       <section>
         <h2>References and Reproducibility</h2>
-        <p>Primary regulatory and data references:</p>
-        <ul>
-          <li><a href="https://www.bis.org/publ/bcbs279.pdf">Basel Committee: The standardised approach for measuring counterparty credit risk exposures</a></li>
-          <li><a href="https://www.bis.org/basel_framework/chapter/CRE/52.htm">BIS Basel Framework CRE52: Standardised approach to counterparty credit risk</a></li>
-          <li><a href="https://pddata.dtcc.com/ppd/info-center">DTCC Public Price Dissemination Dashboard</a></li>
-        </ul>
-        <div class="formula">python scripts/download_dtcc_sdr.py --date 2025-02-14
-python scripts/build_saccr_sample_from_sdr.py
+        <p>Primary regulatory references and reproducibility commands:</p>
+        <ul><li><a href="https://www.bis.org/publ/bcbs279.pdf">Basel Committee: The standardised approach for measuring counterparty credit risk exposures</a></li><li><a href="https://www.bis.org/basel_framework/chapter/CRE/52.htm">BIS Basel Framework CRE52: Standardised approach to counterparty credit risk</a></li><li><a href="https://www.gov.cn/zhengce/202311/content_6913410.htm">China State Council / NFRA: Commercial Bank Capital Management Measures</a></li></ul>
+        <div class="formula">python scripts/build_industry_style_sample.py
 python scripts/run_saccr.py
 python scripts/generate_report.py
 pytest</div>
