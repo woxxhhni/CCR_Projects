@@ -112,6 +112,12 @@ Run the SA-CCR engine:
 python scripts/run_saccr.py
 ```
 
+Generate the interview-ready portfolio report:
+
+```bash
+python scripts/generate_report.py
+```
+
 Rebuild the curated sample from DTCC SDR raw files:
 
 ```bash
@@ -137,6 +143,11 @@ The run script writes CSV reports to `outputs/`:
 - `unmargined_cap_exposure.csv`
 - `counterparty_summary.csv`
 - `asset_class_summary.csv`
+
+The report generator writes the final delivery reports to:
+
+- `docs/sa_ccr_portfolio_report.html`
+- `docs/sa_ccr_portfolio_report.md`
 
 ## Current Assumptions and Limitations
 
