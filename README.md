@@ -14,6 +14,7 @@ Final reviewer-facing deliverables:
 
 - `docs/sa_ccr_portfolio_report.html`: HTML portfolio capital report covering product scope, methodology, exposure results, and limitations.
 - `docs/SA_CCR_Excel_Reconciliation_Workbook.xlsx`: Excel reconciliation workbook that replicates the main SA-CCR calculation chain in formulas and reconciles it to the Python engine outputs.
+- `docs/project_study_guide_cn.html`: Chinese study guide for understanding each module, formula, output, and interview talking point.
 
 The repository uses one default public-safe dataset:
 
@@ -113,6 +114,8 @@ The report generator writes the final delivery reports to:
 - `docs/sa_ccr_portfolio_report.html`
 - `docs/sa_ccr_portfolio_report.md`
 - `docs/SA_CCR_Excel_Reconciliation_Workbook.xlsx`
+- `docs/project_study_guide_cn.html`
+- `docs/project_study_guide_cn.md`
 
 Excel reconciliation workbook:
 
@@ -138,6 +141,8 @@ CCR_Projects/
 |-- docs/
 |   |-- SA_CCR_Excel_Reconciliation_Workbook.xlsx
 |   |-- methodology.md
+|   |-- project_study_guide_cn.html
+|   |-- project_study_guide_cn.md
 |   |-- regulatory_alignment.md
 |   |-- sa_ccr_portfolio_report.html
 |   `-- sa_ccr_portfolio_report.md

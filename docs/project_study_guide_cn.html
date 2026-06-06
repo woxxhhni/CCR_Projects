@@ -1,0 +1,942 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SA-CCR 项目中文学习手册</title>
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #667085;
+      --line: #d9e0ea;
+      --surface: #ffffff;
+      --soft: #f5f7fb;
+      --navy: #183153;
+      --blue: #2867b2;
+      --teal: #0f8b8d;
+      --green: #2f7d46;
+      --amber: #a96100;
+      --red: #b33a3a;
+      --code: #101828;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #f2f5f9;
+      font-family: Arial, "Microsoft YaHei", "PingFang SC", sans-serif;
+      line-height: 1.62;
+    }
+
+    a {
+      color: var(--blue);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .page {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    aside {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+      padding: 24px 20px;
+      color: #f8fafc;
+      background: var(--navy);
+      border-right: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .brand {
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .brand strong {
+      display: block;
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    .brand span {
+      display: block;
+      margin-top: 8px;
+      color: #c7d4e6;
+      font-size: 13px;
+    }
+
+    nav a {
+      display: block;
+      padding: 9px 10px;
+      color: #dbe7f5;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    nav a:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.10);
+      text-decoration: none;
+    }
+
+    main {
+      max-width: 1180px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 32px 40px 56px;
+    }
+
+    .hero {
+      padding: 28px 0 24px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--teal);
+      font-weight: 700;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--ink);
+      font-size: 34px;
+      line-height: 1.18;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      max-width: 880px;
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .quick-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .quick-links a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 36px;
+      padding: 7px 12px;
+      color: var(--ink);
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid.four {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    section {
+      margin-top: 28px;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      color: var(--ink);
+      font-size: 24px;
+      line-height: 1.28;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 22px 0 10px;
+      color: var(--ink);
+      font-size: 18px;
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 8px 0;
+    }
+
+    .panel,
+    details {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 10px 24px rgba(16, 24, 40, 0.04);
+    }
+
+    .panel {
+      padding: 18px;
+    }
+
+    .metric {
+      padding: 14px 16px;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 4px;
+      color: var(--ink);
+      font-size: 22px;
+      line-height: 1.2;
+    }
+
+    details {
+      margin-top: 14px;
+      overflow: hidden;
+    }
+
+    summary {
+      cursor: pointer;
+      padding: 16px 18px;
+      color: var(--ink);
+      background: #ffffff;
+      border-bottom: 1px solid transparent;
+      font-weight: 800;
+      font-size: 17px;
+      list-style-position: inside;
+    }
+
+    details[open] summary {
+      border-bottom-color: var(--line);
+      background: #f8fafd;
+    }
+
+    .detail-body {
+      padding: 18px;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 9px;
+      background: #edf6f6;
+      color: #0c6264;
+      border: 1px solid #c7e8e8;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .formula {
+      margin: 12px 0;
+      padding: 14px 16px;
+      color: #eef6ff;
+      background: var(--code);
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: Consolas, Monaco, "Courier New", monospace;
+      font-size: 13px;
+      white-space: pre;
+    }
+
+    code {
+      padding: 2px 5px;
+      color: #263750;
+      background: #edf1f7;
+      border-radius: 4px;
+      font-family: Consolas, Monaco, "Courier New", monospace;
+      font-size: 0.95em;
+    }
+
+    table {
+      width: 100%;
+      margin: 14px 0;
+      border-collapse: collapse;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th,
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th {
+      color: #ffffff;
+      background: var(--blue);
+      font-weight: 800;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .callout {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border-left: 4px solid var(--teal);
+      background: #eef8f8;
+      border-radius: 6px;
+    }
+
+    .warning {
+      border-left-color: var(--amber);
+      background: #fff6e9;
+    }
+
+    .quote {
+      margin: 12px 0;
+      padding: 13px 15px;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      font-style: italic;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 36px minmax(0, 1fr);
+      gap: 12px;
+      padding: 14px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .step b {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      color: #ffffff;
+      background: var(--teal);
+      border-radius: 50%;
+    }
+
+    .step strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .qa {
+      display: grid;
+      gap: 12px;
+    }
+
+    .qa-item {
+      padding: 14px 16px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .qa-item strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--blue);
+    }
+
+    .checklist {
+      columns: 2;
+      column-gap: 28px;
+      margin: 8px 0;
+      padding-left: 20px;
+    }
+
+    .checklist li {
+      break-inside: avoid;
+      margin: 7px 0;
+    }
+
+    .footer {
+      margin-top: 34px;
+      padding-top: 18px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      font-size: 13px;
+    }
+
+    @media (max-width: 980px) {
+      .page {
+        grid-template-columns: 1fr;
+      }
+
+      aside {
+        position: static;
+        height: auto;
+      }
+
+      nav {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 4px;
+      }
+
+      main {
+        padding: 24px 18px 42px;
+      }
+
+      .grid.four,
+      .grid.three,
+      .grid.two {
+        grid-template-columns: 1fr;
+      }
+
+      .checklist {
+        columns: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <aside>
+      <div class="brand">
+        <strong>SA-CCR 项目学习手册</strong>
+        <span>按模块理解计算逻辑、代码结构、交付物和面试表达</span>
+      </div>
+      <nav>
+        <a href="#overview">项目总览</a>
+        <a href="#workflow">学习路径</a>
+        <a href="#inputs">输入数据</a>
+        <a href="#pipeline">Pipeline</a>
+        <a href="#enrichment">Trade Enrichment</a>
+        <a href="#addon">AddOn 聚合</a>
+        <a href="#exposure">RC / PFE / EAD</a>
+        <a href="#excel">Excel 对账</a>
+        <a href="#outputs">输出与测试</a>
+        <a href="#limitations">生产差距</a>
+        <a href="#interview">面试问答</a>
+        <a href="#checklist">自测清单</a>
+      </nav>
+    </aside>
+
+    <main>
+      <header class="hero" id="overview">
+        <p class="eyebrow">Basel-Aligned SA-CCR Portfolio Engine</p>
+        <h1>中文学习手册</h1>
+        <p>
+          这份 HTML 手册把项目拆成业务流程、公式、代码模块、输出报表和面试表达几层。目标不是背代码，
+          而是让你能解释每一步为什么这么算，以及它在 SA-CCR workflow 中处于什么位置。
+        </p>
+        <div class="quick-links">
+          <a href="./sa_ccr_portfolio_report.html">HTML 交付报告</a>
+          <a href="./SA_CCR_Excel_Reconciliation_Workbook.xlsx">Excel 对账表</a>
+          <a href="./methodology.md">Methodology</a>
+          <a href="./regulatory_alignment.md">Regulatory Alignment</a>
+        </div>
+      </header>
+
+      <section>
+        <div class="grid four">
+          <div class="panel metric"><span>Trades</span><strong>298</strong></div>
+          <div class="panel metric"><span>Counterparties</span><strong>12</strong></div>
+          <div class="panel metric"><span>Netting Sets</span><strong>95</strong></div>
+          <div class="panel metric"><span>Total EAD</span><strong>656.7mm</strong></div>
+        </div>
+      </section>
+
+      <section id="workflow">
+        <h2>1. 怎么读这个项目</h2>
+        <div class="grid three">
+          <div class="step">
+            <b>1</b>
+            <div>
+              <strong>先看业务全链路</strong>
+              <span>理解输入、计算、聚合、输出，而不是一开始钻进代码细节。</span>
+            </div>
+          </div>
+          <div class="step">
+            <b>2</b>
+            <div>
+              <strong>再看公式落地</strong>
+              <span>重点掌握 effective notional、AddOn、RC、PFE、EAD。</span>
+            </div>
+          </div>
+          <div class="step">
+            <b>3</b>
+            <div>
+              <strong>最后练面试表达</strong>
+              <span>把代码语言翻译成 risk analyst 可以讲清楚的业务语言。</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="formula">Trade data
+-> data quality checks
+-> trade enrichment
+-> adjusted notional / delta / maturity factor
+-> effective notional
+-> asset-class add-on aggregation
+-> RC / PFE multiplier / EAD
+-> reports and Excel reconciliation</div>
+      </section>
+
+      <section>
+        <h2>2. 项目一句话说明</h2>
+        <div class="panel">
+          <p>
+            这个项目是一个基于 Python 的 Basel-aligned SA-CCR demo engine。它读取 synthetic derivative portfolio，
+            对每笔交易做 SA-CCR enrichment，然后按 counterparty、netting set、asset class、hedging set 聚合，
+            最终输出 RC、PFE、EAD 和 illustrative RWA，并生成 HTML 报告和 Excel 对账表。
+          </p>
+          <div class="quote">
+            I built a Python-based Basel-aligned SA-CCR exposure engine covering trade enrichment,
+            adjusted notional, supervisory delta, maturity factor, asset-class add-on aggregation,
+            RC/PFE/EAD calculation, margined EAD cap logic, and reviewer-facing HTML/Excel outputs.
+          </div>
+        </div>
+      </section>
+
+      <section id="inputs">
+        <h2>3. 输入数据</h2>
+        <details open>
+          <summary>输入文件和字段</summary>
+          <div class="detail-body">
+            <table>
+              <thead>
+                <tr><th>文件</th><th>作用</th><th>你要理解的重点</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>data/sample_trades.csv</code></td>
+                  <td>交易级输入表，包含 298 笔 synthetic trades。</td>
+                  <td>产品类型、asset class、notional、direction、maturity、MtM、margin flag。</td>
+                </tr>
+                <tr>
+                  <td><code>data/collateral.csv</code></td>
+                  <td>Netting-set level collateral / CSA 字段。</td>
+                  <td><code>C</code>、<code>TH</code>、<code>MTA</code>、<code>NICA</code> 如何进入 RC。</td>
+                </tr>
+                <tr>
+                  <td><code>data/counterparty_reference.csv</code></td>
+                  <td>Counterparty reference 和 illustrative risk weight。</td>
+                  <td>当前 RWA 是 demo 级，不是完整信用风险资本引擎。</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>产品覆盖</h3>
+            <div class="tag-row">
+              <span class="tag">Interest Rate</span>
+              <span class="tag">FX</span>
+              <span class="tag">Credit</span>
+              <span class="tag">Equity</span>
+              <span class="tag">Commodity</span>
+            </div>
+            <p>
+              交易样本覆盖 IRS、Cross Currency Swap、FRA、OIS、Swaption、Cap/Floor、FX Forward、FX Swap、
+              FX Option、CDS、TRS、Equity Option、Commodity Forward/Swap/Option 等 19 类产品。
+            </p>
+          </div>
+        </details>
+      </section>
+
+      <section id="pipeline">
+        <h2>4. Pipeline 总控</h2>
+        <details open>
+          <summary><code>src/saccr_engine/pipeline.py</code></summary>
+          <div class="detail-body">
+            <p>
+              <code>pipeline.py</code> 是整个项目的编排层。它自己不写复杂公式，而是按顺序调用各个模块，
+              并返回所有中间结果，方便输出 CSV、生成报告和做 Excel 对账。
+            </p>
+            <div class="formula">validate_trades(trades)
+enrich_trades(trades)
+calculate_addons(enriched)
+calculate_replacement_costs(enriched, collateral)
+calculate_exposure(netting_set_addon, replacement_costs, counterparty_reference)
+apply_margined_ead_cap(...)
+build_counterparty_summary(...)
+build_asset_class_summary(...)</div>
+            <div class="callout">
+              面试表达：The pipeline separates concerns. Data validation, trade enrichment,
+              add-on aggregation, exposure calculation, and reporting are implemented in separate modules,
+              while <code>pipeline.py</code> orchestrates the end-to-end workflow.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <section id="enrichment">
+        <h2>5. Trade-Level Enrichment</h2>
+        <details open>
+          <summary><code>src/saccr_engine/enrichment.py</code></summary>
+          <div class="detail-body">
+            <p>
+              这是最关键的计算模块之一。它把原始交易字段转换成 SA-CCR 需要的逐笔计算字段。
+              最重要的输出是 <code>Effective Notional</code>。
+            </p>
+
+            <div class="formula">Effective Notional = Adjusted Notional * Delta * Maturity Factor</div>
+
+            <table>
+              <thead>
+                <tr><th>字段</th><th>含义</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>Remaining Maturity Years</code></td><td>到期日到 COB date 的剩余期限。</td></tr>
+                <tr><td><code>Maturity Bucket</code></td><td>IR 使用的 <code>&lt;1Y</code>、<code>1Y-5Y</code>、<code>&gt;5Y</code>。</td></tr>
+                <tr><td><code>Hedging Set</code></td><td>IR 按 currency，FX 按 currency pair，credit/equity 按 entity，commodity 按 group。</td></tr>
+                <tr><td><code>Supervisory Factor</code></td><td>Base factor 乘以 basis/volatility adjustment。</td></tr>
+                <tr><td><code>Supervisory Duration</code></td><td>Interest Rate 和 Credit 的 duration adjustment。</td></tr>
+                <tr><td><code>Delta</code></td><td>线性交易为 +/-1；option 使用 supervisory option delta。</td></tr>
+                <tr><td><code>Maturity Factor</code></td><td>Unmargined 用 remaining maturity；margined 用 MPOR。</td></tr>
+              </tbody>
+            </table>
+
+            <h3>Supervisory Duration</h3>
+            <div class="formula">SD = (exp(-0.05 * S) - exp(-0.05 * E)) / 0.05</div>
+            <p>
+              只对 Interest Rate 和 Credit 使用。其他 asset class 当前设为 1。
+            </p>
+
+            <h3>Option Delta</h3>
+            <div class="formula">Call delta = direction * N(d1)
+Put delta  = -direction * N(-d1)
+
+d1 = [ln(P / K) + 0.5 * sigma^2 * T] / [sigma * sqrt(T)]</div>
+
+            <h3>Maturity Factor</h3>
+            <div class="grid two">
+              <div class="panel">
+                <strong>Unmargined</strong>
+                <div class="formula">MF = sqrt(min(M, 1))</div>
+              </div>
+              <div class="panel">
+                <strong>Margined</strong>
+                <div class="formula">MF = 1.5 * sqrt(MPOR / 250)</div>
+              </div>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <section id="addon">
+        <h2>6. AddOn 聚合</h2>
+        <details open>
+          <summary><code>src/saccr_engine/addon.py</code></summary>
+          <div class="detail-body">
+            <p>
+              AddOn 模块把逐笔交易的 effective notional 按 asset class 的规则聚合成 netting set add-on。
+              不同 asset class 的 aggregation 逻辑不一样。
+            </p>
+
+            <table>
+              <thead>
+                <tr><th>Asset Class</th><th>聚合逻辑</th><th>要点</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Interest Rate</td>
+                  <td>按 currency hedging set 和 maturity bucket 聚合。</td>
+                  <td>使用 <code>D1/D2/D3</code> bucket partial offset formula。</td>
+                </tr>
+                <tr>
+                  <td>FX</td>
+                  <td>按 currency pair 聚合。</td>
+                  <td>同一 pair 内 long/short 可以抵消。</td>
+                </tr>
+                <tr>
+                  <td>Credit / Equity</td>
+                  <td>先按 underlying entity，再做 correlation aggregation。</td>
+                  <td>Index 和 single-name correlation 不同。</td>
+                </tr>
+                <tr>
+                  <td>Commodity</td>
+                  <td>按 commodity group/type 做 correlation aggregation。</td>
+                  <td>Electricity 使用单独 factor 和 volatility bucket。</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>Interest Rate 公式</h3>
+            <div class="formula">Aggregated Effective Notional
+= sqrt(D1^2 + D2^2 + D3^2 + 1.4*D1*D2 + 1.4*D2*D3 + 0.6*D1*D3)
+
+IR AddOn = Aggregated Effective Notional * 0.005</div>
+
+            <h3>Credit / Equity / Commodity correlation 公式</h3>
+            <div class="formula">Entity AddOn = Effective Notional * Supervisory Factor
+Systematic Component = Correlation * Entity AddOn
+Idiosyncratic Component = (1 - Correlation^2) * Entity AddOn^2
+
+AddOn = sqrt(Systematic_Total^2 + Idiosyncratic_Total)</div>
+
+            <div class="callout">
+              面试表达：Add-on aggregation is asset-class specific. The final netting-set AddOn is
+              the sum of asset-class add-ons.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <section id="exposure">
+        <h2>7. RC / PFE / EAD</h2>
+        <details open>
+          <summary><code>src/saccr_engine/exposure.py</code></summary>
+          <div class="detail-body">
+            <p>
+              Exposure 模块把 netting-set AddOn 转成监管暴露结果：RC、PFE、EAD、RWA。
+            </p>
+
+            <div class="grid three">
+              <div class="panel">
+                <strong>Unmargined RC</strong>
+                <div class="formula">RC = max(V - C, 0)</div>
+              </div>
+              <div class="panel">
+                <strong>Margined RC</strong>
+                <div class="formula">RC = max(V - C, TH + MTA - NICA, 0)</div>
+              </div>
+              <div class="panel">
+                <strong>EAD</strong>
+                <div class="formula">EAD = 1.4 * (RC + PFE)</div>
+              </div>
+            </div>
+
+            <h3>PFE multiplier</h3>
+            <div class="formula">multiplier = min(1, floor + (1 - floor) * exp((V - C) / [2 * (1 - floor) * AddOn]))
+floor = 0.05
+
+PFE = multiplier * AddOn Aggregate</div>
+            <p>
+              直觉：如果 netting set 是 over-collateralized 或 negative MtM，multiplier 会下降；
+              但不会低于 5% floor。
+            </p>
+
+            <h3>Margined EAD Cap</h3>
+            <div class="formula">Margined EAD <= same netting set calculated on an unmargined basis</div>
+            <p>
+              项目会强制把同一 portfolio 按 unmargined 再跑一次。如果 margined EAD 高于 unmargined basis EAD，
+              则把它 cap 到 unmargined EAD。
+            </p>
+          </div>
+        </details>
+      </section>
+
+      <section id="excel">
+        <h2>8. Excel 对账表</h2>
+        <details open>
+          <summary><code>docs/SA_CCR_Excel_Reconciliation_Workbook.xlsx</code></summary>
+          <div class="detail-body">
+            <p>
+              这是理解和展示项目最有价值的交付物之一。它用 Excel 公式复刻 Python 的核心计算链路，
+              并逐层对账。
+            </p>
+            <table>
+              <thead>
+                <tr><th>Sheet</th><th>用途</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>Summary</code></td><td>总览：trade count、counterparty count、AddOn、PFE、RC、EAD。</td></tr>
+                <tr><td><code>Checks</code></td><td>Excel vs Python 的 pass/fail 控制表。</td></tr>
+                <tr><td><code>Trade_Calc</code></td><td>逐笔交易 formula replication。</td></tr>
+                <tr><td><code>AddOn_Calc</code></td><td>AddOn aggregation formula replication。</td></tr>
+                <tr><td><code>Netting_Set_Calc</code></td><td>RC、multiplier、PFE、EAD、RWA 对账。</td></tr>
+                <tr><td><code>Counterparty_Calc</code></td><td>Counterparty 层汇总对账。</td></tr>
+                <tr><td><code>Python_*</code></td><td>Python 输出，作为 reconciliation target。</td></tr>
+              </tbody>
+            </table>
+            <div class="callout">
+              当前对账结果：Trade effective notional、AddOn detail、asset class add-on、netting-set EAD、
+              counterparty EAD 和 total EAD 全部为 OK。最大差异是 floating point precision 级别。
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <section id="outputs">
+        <h2>9. 输出、报告和测试</h2>
+        <details>
+          <summary>Outputs and Tests</summary>
+          <div class="detail-body">
+            <h3>核心输出 CSV</h3>
+            <table>
+              <thead>
+                <tr><th>文件</th><th>含义</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>outputs/trade_level_enriched.csv</code></td><td>逐笔交易 enriched 字段。</td></tr>
+                <tr><td><code>outputs/addon_detail.csv</code></td><td>AddOn 聚合明细。</td></tr>
+                <tr><td><code>outputs/asset_class_addon.csv</code></td><td>Netting set + asset class 层 AddOn。</td></tr>
+                <tr><td><code>outputs/netting_set_exposure.csv</code></td><td>RC/PFE/EAD/RWA 核心结果。</td></tr>
+                <tr><td><code>outputs/unmargined_cap_exposure.csv</code></td><td>Margined EAD cap 对照结果。</td></tr>
+                <tr><td><code>outputs/counterparty_summary.csv</code></td><td>Counterparty 层汇总。</td></tr>
+              </tbody>
+            </table>
+
+            <h3>测试覆盖</h3>
+            <p><code>tests/test_core_calculations.py</code> 目前覆盖：</p>
+            <ul>
+              <li>RC floor at zero</li>
+              <li>Margined RC 使用 TH/MTA/NICA</li>
+              <li>PFE multiplier 在 5% floor 和 1 之间</li>
+              <li>Normal CDF midpoint</li>
+              <li>Basis transaction supervisory factor adjustment</li>
+              <li>Full pipeline smoke test</li>
+            </ul>
+          </div>
+        </details>
+      </section>
+
+      <section id="limitations">
+        <h2>10. 和真实生产系统的差距</h2>
+        <details>
+          <summary>不要过度宣称 production-ready</summary>
+          <div class="detail-body">
+            <div class="warning callout">
+              这个项目适合描述为 Basel-aligned educational / interview portfolio engine。
+              不要说成 fully production-compliant regulatory capital engine。
+            </div>
+            <table>
+              <thead>
+                <tr><th>领域</th><th>当前项目</th><th>真实生产系统还需要</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>数据</td><td>Synthetic portfolio</td><td>Source lineage、market data feed、daily controls。</td></tr>
+                <tr><td>Legal netting</td><td>用 Netting Set ID 表示</td><td>Legal enforceability、jurisdiction review。</td></tr>
+                <tr><td>Collateral</td><td>简化 CSA 字段</td><td>VM/IM、eligibility、haircuts、settlement timing。</td></tr>
+                <tr><td>Product taxonomy</td><td>19 类 demo 产品</td><td>完整产品库、hybrid、exotic mapping。</td></tr>
+                <tr><td>RWA</td><td>Illustrative risk weight</td><td>完整信用风险资本规则和监管报表。</td></tr>
+                <tr><td>CVA/CCP</td><td>不在范围内</td><td>CVA capital、default fund、CCP-specific rules。</td></tr>
+                <tr><td>Governance</td><td>README、tests、Excel reconciliation</td><td>Model validation、change control、audit sign-off。</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <section id="interview">
+        <h2>11. 面试问答模板</h2>
+        <div class="qa">
+          <div class="qa-item">
+            <strong>Q1: 你这个项目主要做什么？</strong>
+            <p>
+              This project implements a Basel-aligned SA-CCR portfolio exposure workflow in Python.
+              It starts from synthetic trade, collateral, and counterparty reference data, enriches trades
+              with SA-CCR fields, aggregates add-ons by asset class and netting set, calculates RC, PFE,
+              EAD, and illustrative RWA, and produces both an HTML report and an Excel reconciliation workbook.
+            </p>
+          </div>
+          <div class="qa-item">
+            <strong>Q2: 为什么不用 notebook？</strong>
+            <p>
+              I wanted this to look like a maintainable Python project rather than a one-off notebook.
+              The code is split into modules for configuration, data checks, enrichment, add-on aggregation,
+              exposure calculation, pipeline orchestration, and reporting.
+            </p>
+          </div>
+          <div class="qa-item">
+            <strong>Q3: SA-CCR 的核心公式是什么？</strong>
+            <div class="formula">EAD = alpha * (RC + PFE)
+alpha = 1.4
+PFE = multiplier * AddOn Aggregate</div>
+          </div>
+          <div class="qa-item">
+            <strong>Q4: Excel 对账表的作用是什么？</strong>
+            <p>
+              The Excel workbook is an independent transparency layer. It recreates the main Python
+              calculations in Excel formulas and reconciles trade-level effective notional, add-on detail,
+              netting-set EAD, and counterparty EAD against the Python outputs.
+            </p>
+          </div>
+          <div class="qa-item">
+            <strong>Q5: 这个项目和真实监管系统有什么差距？</strong>
+            <p>
+              It is Basel-aligned for the core SA-CCR exposure workflow, but it is not a production
+              regulatory capital engine. It simplifies legal netting enforceability, collateral eligibility
+              and haircuts, product taxonomy, market data sourcing, risk-weight calculation, CVA/CCP capital,
+              and formal model governance.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="checklist">
+        <h2>12. 自测清单</h2>
+        <div class="panel">
+          <ul class="checklist">
+            <li>这个项目的三个输入 CSV 分别是什么？</li>
+            <li><code>pipeline.py</code> 的调用顺序是什么？</li>
+            <li><code>outputs/</code> 里的每个 CSV 大概代表什么？</li>
+            <li><code>Effective Notional</code> 怎么算？</li>
+            <li>IR supervisory duration 为什么只对 Interest Rate / Credit 使用？</li>
+            <li>Option delta 需要哪些字段？</li>
+            <li>Margined maturity factor 和 unmargined maturity factor 有什么区别？</li>
+            <li>IR AddOn 为什么要分三个 maturity bucket？</li>
+            <li>Credit/Equity 为什么要用 correlation aggregation？</li>
+            <li>PFE multiplier 的 floor 是多少？</li>
+            <li>EAD cap 为什么要重跑 unmargined exposure？</li>
+            <li>如果面试官问“这是不是完整监管系统”，你怎么回答？</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2>13. 重点记住的 8 句话</h2>
+        <div class="panel">
+          <ol>
+            <li>这个项目是 Basel-aligned SA-CCR core exposure workflow demo，不是完整生产监管系统。</li>
+            <li>核心公式是 <code>EAD = 1.4 * (RC + PFE)</code>。</li>
+            <li><code>PFE = multiplier * AddOn Aggregate</code>。</li>
+            <li>逐笔交易最核心字段是 <code>Effective Notional = Adjusted Notional * Delta * Maturity Factor</code>。</li>
+            <li>AddOn aggregation 是 asset-class specific 的。</li>
+            <li>RC 是当前暴露，PFE 是潜在未来暴露。</li>
+            <li>Margined netting set 使用 CSA 字段计算 RC，并应用 unmargined EAD cap。</li>
+            <li>Excel reconciliation workbook 用公式复刻 Python 结果，是 reviewer-facing audit layer。</li>
+          </ol>
+        </div>
+      </section>
+
+      <div class="footer">
+        Generated for the CCR_Projects SA-CCR portfolio engine. Source Markdown:
+        <a href="./project_study_guide_cn.md">project_study_guide_cn.md</a>.
+      </div>
+    </main>
+  </div>
+</body>
+</html>
