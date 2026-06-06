@@ -1,0 +1,9 @@
+Counterparty ID,Counterparty Type,Credit Rating,Risk Weight
+CP_BANK_A,Bank,A,0.5
+CP_BANK_B,Bank,BBB,0.5
+CP_ASSET_MANAGER_A,Financial Institution,BBB,0.5
+CP_HEDGE_FUND_A,Fund,BB,1.0
+CP_CORPORATE_A,Corporate,BBB,1.0
+CP_INSURER_A,Insurance,A,0.5
+CP_SOVEREIGN_A,Sovereign,AA,0.2
+CP_PENSION_A,Pension,A,0.5

@@ -1,0 +1,15 @@
+[project]
+name = "ccr-projects"
+version = "0.1.0"
+description = "Counterparty credit risk and SA-CCR portfolio capital calculation examples."
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.26",
+    "pandas>=2.0",
+    "openpyxl>=3.1",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
