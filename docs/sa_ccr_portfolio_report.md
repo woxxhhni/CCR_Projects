@@ -115,7 +115,6 @@ The engine enriches trades with hedging sets, supervisory factors, supervisory d
 
 - Basel Committee on Banking Supervision, [The standardised approach for measuring counterparty credit risk exposures](https://www.bis.org/publ/bcbs279.pdf).
 - BIS Basel Framework, [CRE52 - Standardised approach to counterparty credit risk](https://www.bis.org/basel_framework/chapter/CRE/52.htm).
-- China State Council / NFRA, [Commercial Bank Capital Management Measures](https://www.gov.cn/zhengce/202311/content_6913410.htm).
 
 ## 6. Reproducibility
 
