@@ -9,4 +9,5 @@ venv/
 .DS_Store
 *.xlsx
 *.xls
+!docs/SA_CCR_Excel_Reconciliation_Workbook.xlsx
 data/raw_sdr/

@@ -32,7 +32,7 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument("--trade-note", default="Generated industry-style trades")
-    parser.add_argument("--workflow", choices=["industry-style", "dtcc"], default="industry-style")
+    parser.add_argument("--workflow", choices=["industry-style"], default="industry-style")
     return parser.parse_args()
 
 
@@ -188,13 +188,10 @@ def build_markdown_report(context: dict[str, object]) -> str:
 
 
 def reference_markdown_lines(workflow: object) -> list[str]:
-    lines = [
+    return [
         "- Basel Committee on Banking Supervision, [The standardised approach for measuring counterparty credit risk exposures](https://www.bis.org/publ/bcbs279.pdf).",
         "- BIS Basel Framework, [CRE52 - Standardised approach to counterparty credit risk](https://www.bis.org/basel_framework/chapter/CRE/52.htm).",
     ]
-    if workflow == "dtcc":
-        lines.append("- DTCC, [Public Price Dissemination Dashboard](https://pddata.dtcc.com/ppd/info-center).")
-    return lines
 
 
 def build_html_report(context: dict[str, object]) -> str:
@@ -610,8 +607,6 @@ def references_html(workflow: object) -> str:
         ("https://www.bis.org/publ/bcbs279.pdf", "Basel Committee: The standardised approach for measuring counterparty credit risk exposures"),
         ("https://www.bis.org/basel_framework/chapter/CRE/52.htm", "BIS Basel Framework CRE52: Standardised approach to counterparty credit risk"),
     ]
-    if workflow == "dtcc":
-        references.append(("https://pddata.dtcc.com/ppd/info-center", "DTCC Public Price Dissemination Dashboard"))
     items = "".join(
         f'<li><a href="{escape(url)}">{escape(label)}</a></li>' for url, label in references
     )
@@ -785,16 +780,8 @@ def html_table_with_cap_badges(rows: list[list[str]], headers: list[str]) -> str
 
 
 def workflow_commands(workflow: object) -> list[str]:
-    if workflow == "industry-style":
-        return [
-            "python scripts/build_industry_style_sample.py",
-            "python scripts/run_saccr.py",
-            "python scripts/generate_report.py",
-            "pytest",
-        ]
     return [
-        "python scripts/download_dtcc_sdr.py --date 2025-02-14",
-        "python scripts/build_saccr_sample_from_sdr.py",
+        "python scripts/build_industry_style_sample.py",
         "python scripts/run_saccr.py",
         "python scripts/generate_report.py",
         "pytest",
