@@ -1,14 +1,14 @@
 # CCR Projects
 
-Python projects for counterparty credit risk (CCR), exposure aggregation, and SA-CCR style regulatory capital workflows.
+Python projects for counterparty credit risk (CCR), exposure aggregation, and SA-CCR regulatory capital workflows.
 
-This repository is being built as an interview-ready portfolio for risk analyst roles. The first project is a simplified SA-CCR portfolio capital engine implemented as a normal Python project rather than a notebook.
+This repository is being built as an interview-ready portfolio for risk analyst roles. The first project is a Basel-aligned SA-CCR portfolio capital engine implemented as a normal Python project rather than a notebook.
 
 ## Project 1: SA-CCR Portfolio Capital Engine
 
 Location: `src/saccr_engine`
 
-The project reads derivative trade data, enriches each trade with SA-CCR style calculation fields, aggregates add-ons by asset class and netting set, and produces counterparty-level EAD/RWA reports.
+The project reads derivative trade data, enriches each trade with SA-CCR calculation fields, aggregates add-ons by asset class and netting set, and produces counterparty-level EAD/RWA reports.
 
 The sample portfolio contains 320 curated trades built from DTCC CFTC Public Price Dissemination swap transaction records for 2025-02-14. The public SDR records provide real transaction economics such as asset class, product identifiers, effective date, maturity date, notional amount, currency, underlier information, and cleared indicator. Internal bank fields that are not publicly disseminated, such as counterparty, netting set, collateral, risk weight, trade direction, and MtM, are added with deterministic synthetic enrichment for SA-CCR demonstration.
 
@@ -41,25 +41,29 @@ This project is designed to match common risk analyst responsibilities:
 
 ## Methodology
 
-The simplified engine follows the core SA-CCR structure:
+The engine follows the core SA-CCR structure:
 
 ```text
 EAD = alpha * (RC + PFE)
 alpha = 1.4
 PFE = multiplier * AddOn_aggregate
-RC = max(V - C, 0)
+
+Unmargined RC = max(V - C, 0)
+Margined RC = max(V - C, TH + MTA - NICA, 0)
 ```
 
 The engine implements:
 
 - supervisory duration for interest rate and credit trades
 - unmargined and margined maturity factors
-- option-aware supervisory delta approximation using available option fields
-- supervisory factors by asset class / rating / product type
+- option-aware supervisory delta using Basel-style supervisory option volatility
+- supervisory factors by asset class, rating, and product type
+- basis and volatility transaction supervisory-factor adjustments
 - IR maturity-bucket aggregation
 - FX currency-pair aggregation
 - credit, equity, and commodity correlation-style add-on aggregation
 - collateral-aware PFE multiplier with 5% floor
+- EAD cap for margined netting sets based on the same portfolio calculated on an unmargined basis
 - counterparty-level risk weight mapping for illustrative RWA
 
 Primary reference: Basel Committee on Banking Supervision, [The standardised approach for measuring counterparty credit risk exposures](https://www.bis.org/publ/bcbs279.pdf).
@@ -68,30 +72,30 @@ Primary reference: Basel Committee on Banking Supervision, [The standardised app
 
 ```text
 CCR_Projects/
-├── data/
-│   ├── sample_trades.csv
-│   ├── collateral.csv
-│   ├── README.md
-│   └── counterparty_reference.csv
-├── docs/
-│   └── methodology.md
-├── scripts/
-│   ├── build_saccr_sample_from_sdr.py
-│   ├── download_dtcc_sdr.py
-│   └── run_saccr.py
-├── src/
-│   └── saccr_engine/
-│       ├── addon.py
-│       ├── config.py
-│       ├── data_checks.py
-│       ├── enrichment.py
-│       ├── exposure.py
-│       ├── pipeline.py
-│       └── reporting.py
-├── tests/
-│   └── test_core_calculations.py
-├── requirements.txt
-└── README.md
+|-- data/
+|   |-- sample_trades.csv
+|   |-- collateral.csv
+|   |-- README.md
+|   `-- counterparty_reference.csv
+|-- docs/
+|   `-- methodology.md
+|-- scripts/
+|   |-- build_saccr_sample_from_sdr.py
+|   |-- download_dtcc_sdr.py
+|   `-- run_saccr.py
+|-- src/
+|   `-- saccr_engine/
+|       |-- addon.py
+|       |-- config.py
+|       |-- data_checks.py
+|       |-- enrichment.py
+|       |-- exposure.py
+|       |-- pipeline.py
+|       `-- reporting.py
+|-- tests/
+|   `-- test_core_calculations.py
+|-- requirements.txt
+`-- README.md
 ```
 
 ## Quick Start
@@ -130,6 +134,7 @@ The run script writes CSV reports to `outputs/`:
 - `addon_detail.csv`
 - `asset_class_addon.csv`
 - `netting_set_exposure.csv`
+- `unmargined_cap_exposure.csv`
 - `counterparty_summary.csv`
 - `asset_class_summary.csv`
 
@@ -142,15 +147,15 @@ Key simplifications:
 - the public SDR trade economics are real, but internal counterparty, netting set, collateral, risk weight, trade direction, and MtM fields are synthetically added
 - market data conversion is simplified; non-USD notionals are converted with a static FX table for project reproducibility
 - equity and commodity adjusted notionals use base notional as a proxy when price/unit data is unavailable
-- option delta uses available strike, underlying price, exercise date, and a simplified supervisory volatility table
+- option delta uses available strike, underlying price, exercise date, and Basel supervisory option volatility buckets
 - risk weights are illustrative and supplied through `data/counterparty_reference.csv`
-- collateral data is provided through a simple netting-set level reference file
-- basis and volatility transactions are separated in hedging-set labels, but production treatment would require more detailed rule coverage
+- collateral and margin agreement fields are deterministic synthetic data because public SDR feeds do not disclose bank CSA terms
+- legal enforceability, collateral eligibility/haircuts, exact NICA treatment, settlement timing, multi-risk hybrid allocation, and jurisdiction-specific reporting templates are outside the current scope
 
 ## Resume-Ready Description
 
-Built a Python-based SA-CCR portfolio capital calculation engine to aggregate derivative exposures by counterparty, netting set, asset class, and hedging set.
+Built a Python-based Basel-aligned SA-CCR portfolio capital calculation engine to aggregate derivative exposures by counterparty, netting set, asset class, and hedging set.
 
-Implemented trade enrichment, supervisory factors, adjusted notional, maturity factor, add-on aggregation, PFE multiplier, replacement cost, EAD, and illustrative RWA reporting.
+Implemented trade enrichment, supervisory factors, adjusted notional, maturity factors, add-on aggregation, PFE multiplier, margined/unmargined replacement cost, EAD cap logic, and illustrative RWA reporting.
 
 Developed reproducible risk reports to summarize capital drivers by counterparty and asset class using pandas and NumPy.

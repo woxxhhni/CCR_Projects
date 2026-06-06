@@ -4,6 +4,8 @@ ALPHA = 1.4
 MULTIPLIER_FLOOR = 0.05
 BUSINESS_DAYS_PER_YEAR = 250.0
 SUPERVISORY_DURATION_RATE = 0.05
+BASIS_SUPERVISORY_FACTOR_MULTIPLIER = 0.5
+VOLATILITY_SUPERVISORY_FACTOR_MULTIPLIER = 5.0
 
 MaturityBucket = str
 
@@ -44,9 +46,12 @@ CORRELATIONS = {
 OPTION_SUPERVISORY_VOLATILITY = {
     "Interest Rate": 0.50,
     "FX": 0.15,
-    "Credit": 1.00,
-    "Equity": 1.20,
-    "Commodity": 0.70,
+    "Credit Single Name": 1.00,
+    "Credit Index": 0.80,
+    "Equity Single Name": 1.20,
+    "Equity Index": 0.75,
+    "Commodity Electricity": 1.50,
+    "Commodity Other": 0.70,
 }
 
 COMMODITY_GROUPS = {
@@ -72,4 +77,3 @@ COMMODITY_FACTOR_KEYS = {
     "Copper": "Commodity Metals",
     "Wheat": "Commodity Agricultural",
 }
-

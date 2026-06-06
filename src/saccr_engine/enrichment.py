@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 
 from saccr_engine.config import (
+    BASIS_SUPERVISORY_FACTOR_MULTIPLIER,
     BUSINESS_DAYS_PER_YEAR,
     COMMODITY_FACTOR_KEYS,
     COMMODITY_GROUPS,
@@ -18,10 +19,11 @@ from saccr_engine.config import (
     OPTION_SUPERVISORY_VOLATILITY,
     SUPERVISORY_DURATION_RATE,
     SUPERVISORY_FACTORS,
+    VOLATILITY_SUPERVISORY_FACTOR_MULTIPLIER,
 )
 
 
-def enrich_trades(trades: pd.DataFrame) -> pd.DataFrame:
+def enrich_trades(trades: pd.DataFrame, force_unmargined: bool = False) -> pd.DataFrame:
     """Add calculation fields needed by the SA-CCR engine."""
     df = trades.copy()
     date_columns = ["COB Date", "Maturity Date", "Start Date", "End Date", "Contractual Exercise Date"]
@@ -45,10 +47,14 @@ def enrich_trades(trades: pd.DataFrame) -> pd.DataFrame:
     df["Commodity Group"] = df.apply(assign_commodity_group, axis=1)
     df["Commodity Type"] = df["Sub Class"].fillna("Unknown")
     df["Hedging Set"] = df.apply(assign_hedging_set, axis=1)
-    df["Supervisory Factor"] = df.apply(assign_supervisory_factor, axis=1)
+    df["SA-CCR Margin Treatment"] = margin_treatment(df, force_unmargined)
+    df["Supervisory Factor Base"] = df.apply(assign_base_supervisory_factor, axis=1)
+    df["Supervisory Factor Adjustment"] = df.apply(supervisory_factor_adjustment, axis=1)
+    df["Supervisory Factor"] = df["Supervisory Factor Base"] * df["Supervisory Factor Adjustment"]
     df["Correlation"] = df.apply(assign_correlation, axis=1)
     df["Supervisory Duration"] = df.apply(supervisory_duration, axis=1)
     df["Adjusted Notional"] = df.apply(adjusted_notional, axis=1)
+    df["Supervisory Option Volatility"] = df.apply(assign_option_volatility, axis=1)
     df["Delta"] = df.apply(supervisory_delta, axis=1)
     df["Maturity Factor"] = df.apply(maturity_factor, axis=1)
     df["Effective Notional"] = (
@@ -70,6 +76,14 @@ def clean_text(value: Any, default: str = "") -> str:
     if pd.isna(value):
         return default
     return str(value).strip()
+
+
+def margin_treatment(df: pd.DataFrame, force_unmargined: bool) -> pd.Series:
+    if force_unmargined:
+        return pd.Series("U", index=df.index)
+    if "Margined/ Unmargined" not in df.columns:
+        return pd.Series("U", index=df.index)
+    return df["Margined/ Unmargined"].fillna("U").astype(str).str.strip().str.upper()
 
 
 def assign_commodity_group(row: pd.Series) -> str:
@@ -105,6 +119,10 @@ def assign_hedging_set(row: pd.Series) -> str:
 
 
 def assign_supervisory_factor(row: pd.Series) -> float:
+    return assign_base_supervisory_factor(row) * supervisory_factor_adjustment(row)
+
+
+def assign_base_supervisory_factor(row: pd.Series) -> float:
     asset_class = row["Asset Class"]
     if asset_class == "Interest Rate":
         return SUPERVISORY_FACTORS["Interest Rate"]
@@ -122,6 +140,15 @@ def assign_supervisory_factor(row: pd.Series) -> float:
         factor_key = COMMODITY_FACTOR_KEYS.get(subclass, "Commodity Other")
         return SUPERVISORY_FACTORS[factor_key]
     return 0.0
+
+
+def supervisory_factor_adjustment(row: pd.Series) -> float:
+    indicator = clean_text(row.get("Basis/Volatility Indicator")).lower()
+    if indicator == "basis":
+        return BASIS_SUPERVISORY_FACTOR_MULTIPLIER
+    if indicator == "volatility":
+        return VOLATILITY_SUPERVISORY_FACTOR_MULTIPLIER
+    return 1.0
 
 
 def assign_correlation(row: pd.Series) -> float:
@@ -177,7 +204,9 @@ def adjusted_notional(row: pd.Series) -> float:
 
 
 def maturity_factor(row: pd.Series) -> float:
-    margin_flag = clean_text(row.get("Margined/ Unmargined")).upper()
+    margin_flag = clean_text(
+        row.get("SA-CCR Margin Treatment", row.get("Margined/ Unmargined"))
+    ).upper()
     remaining_years = max(as_number(row.get("Remaining Maturity Years")), 10.0 / BUSINESS_DAYS_PER_YEAR)
     if margin_flag == "M":
         mpor_days = as_number(row.get("Margin Frequency (Business Days)"), 10.0)
@@ -186,6 +215,24 @@ def maturity_factor(row: pd.Series) -> float:
         mpor_days = max(mpor_days, floor_days)
         return 1.5 * math.sqrt(mpor_days / BUSINESS_DAYS_PER_YEAR)
     return math.sqrt(min(remaining_years, 1.0))
+
+
+def assign_option_volatility(row: pd.Series) -> float:
+    asset_class = row["Asset Class"]
+    entity_type = clean_text(row.get("Underlying Entity Type")).lower()
+    if asset_class in {"Interest Rate", "FX"}:
+        return OPTION_SUPERVISORY_VOLATILITY[asset_class]
+    if asset_class == "Credit":
+        key = "Credit Index" if entity_type == "index" else "Credit Single Name"
+        return OPTION_SUPERVISORY_VOLATILITY[key]
+    if asset_class == "Equity":
+        key = "Equity Index" if entity_type == "index" else "Equity Single Name"
+        return OPTION_SUPERVISORY_VOLATILITY[key]
+    if asset_class == "Commodity":
+        subclass = clean_text(row.get("Sub Class"), "Other")
+        key = "Commodity Electricity" if subclass == "Electricity" else "Commodity Other"
+        return OPTION_SUPERVISORY_VOLATILITY[key]
+    return 1.0
 
 
 def supervisory_delta(row: pd.Series) -> float:
@@ -206,7 +253,9 @@ def supervisory_delta(row: pd.Series) -> float:
     else:
         time_to_exercise = max((exercise_date - cob).days / 365.0, 1.0 / 365.0)
 
-    sigma = OPTION_SUPERVISORY_VOLATILITY.get(row["Asset Class"], 1.0)
+    sigma = as_number(row.get("Supervisory Option Volatility"), np.nan)
+    if not np.isfinite(sigma) or sigma <= 0:
+        sigma = assign_option_volatility(row)
     d1 = (math.log(price / strike) + 0.5 * sigma * sigma * time_to_exercise) / (
         sigma * math.sqrt(time_to_exercise)
     )

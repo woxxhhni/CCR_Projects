@@ -9,9 +9,25 @@ import pandas as pd
 from saccr_engine.config import ALPHA, MULTIPLIER_FLOOR
 
 KEYS = ["Counterparty ID", "Netting Set ID"]
+COLLATERAL_COLUMNS = [
+    "Collateral Amount",
+    "Threshold Amount",
+    "Minimum Transfer Amount",
+    "Net Independent Collateral Amount",
+]
 
 
-def replacement_cost(value: float, collateral: float) -> float:
+def replacement_cost(
+    value: float,
+    collateral: float,
+    margin_flag: str = "U",
+    threshold: float = 0.0,
+    minimum_transfer_amount: float = 0.0,
+    nica: float = 0.0,
+) -> float:
+    if str(margin_flag).strip().upper() == "M":
+        margin_call_exposure = threshold + minimum_transfer_amount - nica
+        return max(value - collateral, margin_call_exposure, 0.0)
     return max(value - collateral, 0.0)
 
 
@@ -23,24 +39,94 @@ def pfe_multiplier(value: float, collateral: float, addon_aggregate: float) -> f
 
 
 def calculate_replacement_costs(
-    enriched_trades: pd.DataFrame, collateral: pd.DataFrame | None = None
+    enriched_trades: pd.DataFrame,
+    collateral: pd.DataFrame | None = None,
+    force_unmargined: bool = False,
 ) -> pd.DataFrame:
     value = (
         enriched_trades.groupby(KEYS, as_index=False)["MtM"]
         .sum()
         .rename(columns={"MtM": "Net MtM"})
     )
+    margin_source = (
+        "SA-CCR Margin Treatment"
+        if "SA-CCR Margin Treatment" in enriched_trades.columns
+        else "Margined/ Unmargined"
+    )
+    margin = (
+        enriched_trades.groupby(KEYS)[margin_source]
+        .agg(lambda values: "M" if (values.astype(str).str.upper() == "M").any() else "U")
+        .reset_index()
+        .rename(columns={margin_source: "Margin Agreement"})
+    )
+    value = value.merge(margin, on=KEYS, how="left")
 
     if collateral is not None and not collateral.empty:
-        value = value.merge(collateral[KEYS + ["Collateral Amount"]], on=KEYS, how="left")
-    else:
-        value["Collateral Amount"] = 0.0
+        available_columns = [column for column in COLLATERAL_COLUMNS if column in collateral.columns]
+        extra_columns = ["Margin Agreement ID"] if "Margin Agreement ID" in collateral.columns else []
+        value = value.merge(collateral[KEYS + available_columns + extra_columns], on=KEYS, how="left")
 
-    value["Collateral Amount"] = value["Collateral Amount"].fillna(0.0)
+    for column in COLLATERAL_COLUMNS:
+        if column not in value.columns:
+            value[column] = 0.0
+        value[column] = value[column].fillna(0.0)
+
+    if "Margin Agreement ID" not in value.columns:
+        value["Margin Agreement ID"] = ""
+    value["Margin Agreement ID"] = value["Margin Agreement ID"].fillna("")
+
+    if force_unmargined:
+        value["Margin Agreement"] = "U"
+        value["Collateral Amount"] = value["Net Independent Collateral Amount"]
+
+    value["Margin Agreement"] = value["Margin Agreement"].fillna("U")
     value["RC"] = value.apply(
-        lambda row: replacement_cost(row["Net MtM"], row["Collateral Amount"]), axis=1
+        lambda row: replacement_cost(
+            value=row["Net MtM"],
+            collateral=row["Collateral Amount"],
+            margin_flag=row["Margin Agreement"],
+            threshold=row["Threshold Amount"],
+            minimum_transfer_amount=row["Minimum Transfer Amount"],
+            nica=row["Net Independent Collateral Amount"],
+        ),
+        axis=1,
     )
+    value["RC Formula"] = value["Margin Agreement"].map(
+        {
+            "M": "max(V-C, TH+MTA-NICA, 0)",
+            "U": "max(V-C, 0)",
+        }
+    ).fillna("max(V-C, 0)")
+    if force_unmargined:
+        value["RC Formula"] = "unmargined cap basis: max(V-NICA, 0)"
     return value
+
+
+def apply_margined_ead_cap(
+    exposure: pd.DataFrame,
+    unmargined_exposure: pd.DataFrame,
+) -> pd.DataFrame:
+    result = exposure.merge(
+        unmargined_exposure[KEYS + ["EAD"]].rename(columns={"EAD": "Unmargined EAD Cap"}),
+        on=KEYS,
+        how="left",
+    )
+    result["EAD Before Cap"] = result["EAD"]
+    margin_flag = result["Margin Agreement"].fillna("U").astype(str).str.upper()
+    cap_available = result["Unmargined EAD Cap"].notna()
+    result["EAD Cap Applied"] = (
+        (margin_flag == "M")
+        & cap_available
+        & (result["EAD"] > result["Unmargined EAD Cap"])
+    )
+    result.loc[result["EAD Cap Applied"], "EAD"] = result.loc[
+        result["EAD Cap Applied"], "Unmargined EAD Cap"
+    ]
+    if "Risk Weight" not in result:
+        result["Risk Weight"] = 1.0
+    result["RWA Before Cap"] = result["EAD Before Cap"] * result["Risk Weight"]
+    result["RWA"] = result["EAD"] * result["Risk Weight"]
+    return result
 
 
 def calculate_exposure(
@@ -66,4 +152,3 @@ def calculate_exposure(
     result["Risk Weight"] = result["Risk Weight"].fillna(1.0)
     result["RWA"] = result["EAD"] * result["Risk Weight"]
     return result
-

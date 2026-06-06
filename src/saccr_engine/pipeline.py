@@ -9,7 +9,11 @@ import pandas as pd
 from saccr_engine.addon import calculate_addons
 from saccr_engine.data_checks import validate_trades
 from saccr_engine.enrichment import enrich_trades
-from saccr_engine.exposure import calculate_exposure, calculate_replacement_costs
+from saccr_engine.exposure import (
+    apply_margined_ead_cap,
+    calculate_exposure,
+    calculate_replacement_costs,
+)
 from saccr_engine.reporting import build_asset_class_summary, build_counterparty_summary
 
 
@@ -31,6 +35,18 @@ def run_pipeline(
         netting_set_addon, replacement_costs, counterparty_reference
     )
 
+    unmargined_enriched = enrich_trades(trades, force_unmargined=True)
+    _, unmargined_netting_set_addon, _ = calculate_addons(unmargined_enriched)
+    unmargined_replacement_costs = calculate_replacement_costs(
+        unmargined_enriched, collateral, force_unmargined=True
+    )
+    unmargined_cap_exposure = calculate_exposure(
+        unmargined_netting_set_addon,
+        unmargined_replacement_costs,
+        counterparty_reference,
+    )
+    netting_set_exposure = apply_margined_ead_cap(netting_set_exposure, unmargined_cap_exposure)
+
     counterparty_summary = build_counterparty_summary(netting_set_exposure)
     asset_class_summary = build_asset_class_summary(asset_class_addon)
 
@@ -40,6 +56,7 @@ def run_pipeline(
         "addon_detail": addon_detail,
         "asset_class_addon": asset_class_addon,
         "netting_set_exposure": netting_set_exposure,
+        "unmargined_cap_exposure": unmargined_cap_exposure,
         "counterparty_summary": counterparty_summary,
         "asset_class_summary": asset_class_summary,
     }
@@ -52,4 +69,3 @@ def _read_optional_csv(path: str | Path | None) -> pd.DataFrame | None:
     if not csv_path.exists():
         return None
     return pd.read_csv(csv_path)
-

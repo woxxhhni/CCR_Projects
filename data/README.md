@@ -36,6 +36,16 @@ Synthetic fields:
 - `counterparty_reference.csv`
 - `collateral.csv`
 
+`collateral.csv` is netting-set level synthetic CSA data and includes:
+
+- `Margin Agreement ID`
+- `Collateral Amount`
+- `Threshold Amount`
+- `Minimum Transfer Amount`
+- `Net Independent Collateral Amount`
+
+These fields support the margined replacement cost formula `max(V-C, TH+MTA-NICA, 0)` and the unmargined EAD cap calculation used for margined netting sets.
+
 The public trade identifiers and product economics are retained through source columns such as `Source Dissemination Identifier`, `Source UPI FISN`, and `Source Product Name`.
 
 ## Raw Files
@@ -46,4 +56,3 @@ Raw SDR ZIP files are not committed because they can be large. Recreate them wit
 python scripts/download_dtcc_sdr.py --date 2025-02-14
 python scripts/build_saccr_sample_from_sdr.py
 ```
-

@@ -232,7 +232,8 @@ def map_sdr_row_to_saccr(row: pd.Series) -> dict[str, object]:
     asset_class = ASSET_MAP[source_asset]
     dissemination_id = text(row["Dissemination Identifier"])
     cp = deterministic_choice(COUNTERPARTIES, dissemination_id)
-    netting_set = 1000 + stable_int(f"{cp}-{asset_class}") % 50
+    margin_flag, ccp, margin_frequency = margin_fields(row, dissemination_id)
+    netting_set = 1000 + stable_int(f"{cp}-{asset_class}-{margin_flag}") % 100
 
     leg1 = parse_number(row.get("Notional amount-Leg 1"))
     leg2 = parse_number(row.get("Notional amount-Leg 2"))
@@ -244,7 +245,6 @@ def map_sdr_row_to_saccr(row: pd.Series) -> dict[str, object]:
 
     trade_type = trade_type_from_row(row)
     mtm = synthetic_mtm(base_notional, asset_class, dissemination_id)
-    margin_flag, ccp, margin_frequency = margin_fields(row, dissemination_id)
 
     return {
         "COB Date": REPORT_DATE,
@@ -366,10 +366,11 @@ def base_currency(asset_class: str, ccy1: str, ccy2: str) -> str:
 
 def basis_vol_indicator(row: pd.Series) -> str:
     combined = f"{text(row.get('Product name'))} {text(row.get('UPI FISN'))}".upper()
-    if "OPTION" in combined or "/O " in combined:
-        return "Volatility"
     if "BASIS" in combined:
         return "Basis"
+    volatility_terms = ["VARIANCE", "VOLATILITY", "VOL SWAP", "VOLSWAP", "VOLATILITY SWAP"]
+    if any(term in combined for term in volatility_terms):
+        return "Volatility"
     return ""
 
 
@@ -425,12 +426,21 @@ def write_collateral(trades: pd.DataFrame, path: str | Path) -> None:
     rows = []
     for (cp, netting_set), frame in trades.groupby(["Counterparty ID", "Netting Set ID"]):
         notional = frame["Base Notional"].sum()
-        collateral_ratio = [0.0, 0.02, 0.05, 0.10, 0.15][stable_int(f"{cp}-{netting_set}") % 5]
+        key = f"{cp}-{netting_set}"
+        is_margined = (frame["Margined/ Unmargined"].astype(str).str.upper() == "M").any()
+        collateral_ratio = [0.02, 0.05, 0.10, 0.15][stable_int(key) % 4] if is_margined else 0.0
+        threshold_ratio = [0.0025, 0.005, 0.01][stable_int(f"threshold-{key}") % 3] if is_margined else 0.0
+        mta_ratio = 0.001 if is_margined else 0.0
+        nica_ratio = [0.0, 0.01, 0.02, 0.05][stable_int(f"nica-{key}") % 4] if is_margined else 0.0
         rows.append(
             {
                 "Counterparty ID": cp,
                 "Netting Set ID": netting_set,
+                "Margin Agreement ID": f"CSA-{stable_int(key) % 10000:04d}" if is_margined else "",
                 "Collateral Amount": round(notional * collateral_ratio, 2),
+                "Threshold Amount": round(notional * threshold_ratio, 2),
+                "Minimum Transfer Amount": round(notional * mta_ratio, 2),
+                "Net Independent Collateral Amount": round(notional * nica_ratio, 2),
             }
         )
     pd.DataFrame(rows).to_csv(path, index=False)
